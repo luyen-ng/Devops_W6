@@ -1,90 +1,123 @@
+
 name: CI/CD Pipeline
 
 on:
- push:
-   branches:
-     - main
- pull_request:
-   branches:
-     - main
+push:
+branches:
+  - main
+pull_request:
+branches:
+  - main
 
 jobs:
- # User Service Job
- user-service:
-   name: 🐳 User Service - Build and Push Docker Image
-   runs-on: ubuntu-latest
-   steps:
-     - name: Checkout code
-       uses: actions/checkout@v3
+# User Service Job
+user-service:
+name: 🐳 User Service
+runs-on: ubuntu-latest
+steps:
+  - name: Checkout code
+    uses: actions/checkout@v3
 
-     - name: Set up Node.js for User Service
-       uses: actions/setup-node@v3
-       with:
-         node-version: '20'
+  - name: Set up Node.js for User Service
+    uses: actions/setup-node@v3
+    with:
+      node-version: '20'
 
-     - name: Install dependencies for User Service
-       run: npm install
-       working-directory: ./user-service
+  - name: Install dependencies for User Service
+    run: npm install
+    working-directory: ./user-service
 
-     - name: Build Docker image for User Service
-       run: docker build -t user-service ./user-service
+  - name: Build Docker image for User Service
+    run: docker build -t user-service ./user-service
 
- # Video Service Job
- video-service:
-   name: 🎥 Video Service - Build and Push Docker Image
-   runs-on: ubuntu-latest
-   steps:
-     - name: Checkout code
-       uses: actions/checkout@v3
+  - name: Log in to Docker Hub
+    run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-     - name: Set up Node.js for Video Service
-       uses: actions/setup-node@v3
-       with:
-         node-version: '20'
+  - name: Push User Service to Docker Hub
+    run: |
+      docker tag user-service ${{ secrets.DOCKER_USERNAME }}/user-service:latest
+      docker push ${{ secrets.DOCKER_USERNAME }}/user-service:latest
 
-     - name: Install dependencies for Video Service
-       run: npm install
-       working-directory: ./video-service
+# Video Service Job
+video-service:
+name: 🎥 Video Service
+runs-on: ubuntu-latest
+steps:
+  - name: Checkout code
+    uses: actions/checkout@v3
 
-     - name: Build Docker image for Video Service
-       run: docker build -t video-service ./video-service
+  - name: Set up Node.js for Video Service
+    uses: actions/setup-node@v3
+    with:
+      node-version: '20'
 
- # API Gateway Job
- api-gateway:
-   name: 🚪 API Gateway - Build and Push Docker Image
-   runs-on: ubuntu-latest
-   steps:
-     - name: Checkout code
-       uses: actions/checkout@v3
+  - name: Install dependencies for Video Service
+    run: npm install
+    working-directory: ./video-service
 
-     - name: Set up Node.js for API Gateway
-       uses: actions/setup-node@v3
-       with:
-         node-version: '20'
+  - name: Build Docker image for Video Service
+    run: docker build -t video-service ./video-service
 
-     - name: Install dependencies for API Gateway
-       run: npm install
-       working-directory: ./api-gateway
+  - name: Log in to Docker Hub
+    run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-     - name: Build Docker image for API Gateway
-       run: docker build -t api-gateway ./api-gateway
+  - name: Push Video Service to Docker Hub
+    run: |
+      docker tag video-service ${{ secrets.DOCKER_USERNAME }}/video-service:latest
+      docker push ${{ secrets.DOCKER_USERNAME }}/video-service:latest
 
- # Frontend Service Job
- frontend:
-   name: 💻 Frontend - Build and Push Docker Image
-   runs-on: ubuntu-latest
-   steps:
-     - name: Checkout code
-       uses: actions/checkout@v3
+# API Gateway Job
+api-gateway:
+name: 🚪 API Gateway
+runs-on: ubuntu-latest
+steps:
+  - name: Checkout code
+    uses: actions/checkout@v3
 
-     - name: Set up Node.js for Frontend
-       uses: actions/setup-node@v3
-       with:
-         node-version: '20'
+  - name: Set up Node.js for API Gateway
+    uses: actions/setup-node@v3
+    with:
+      node-version: '20'
 
-     - name: Install dependencies for Frontend
-       run: npm install
-       working-directory: ./frontend
+  - name: Install dependencies for API Gateway
+    run: npm install
+    working-directory: ./api-gateway
 
-     - name: Build Docker image for Frontend
-       run: docker build -t frontend ./frontend
+  - name: Build Docker image for API Gateway
+    run: docker build -t api-gateway ./api-gateway
+
+  - name: Log in to Docker Hub
+    run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+  - name: Push API Gateway to Docker Hub
+    run: |
+      docker tag api-gateway ${{ secrets.DOCKER_USERNAME }}/api-gateway:latest
+      docker push ${{ secrets.DOCKER_USERNAME }}/api-gateway:latest
+
+# Frontend Service Job
+frontend:
+name: 💻 Frontend
+runs-on: ubuntu-latest
+steps:
+  - name: Checkout code
+    uses: actions/checkout@v3
+
+  - name: Set up Node.js for Frontend
+    uses: actions/setup-node@v3
+    with:
+      node-version: '20'
+
+  - name: Install dependencies for Frontend
+    run: npm install
+    working-directory: ./frontend
+
+  - name: Build Docker image for Frontend
+    run: docker build -t frontend ./frontend
+
+  - name: Log in to Docker Hub
+    run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+  - name: Push Frontend to Docker Hub
+    run: |
+      docker tag frontend ${{ secrets.DOCKER_USERNAME }}/frontend:latest
+      docker push ${{ secrets.DOCKER_USERNAME }}/frontend:latest

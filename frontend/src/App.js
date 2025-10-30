@@ -20,7 +20,8 @@ function App() {
       <h1>Users</h1>
       <ul>
         {users.map(user => (
-          <li key={user.id}>{user.name} ({user.email})</li>
+          //<li key={user.id}>{user.name} ({user.email})</li>
+          <li key={user.id}>{user.name} ({user.email}), Age: {user.age}</li>
         ))}
       </ul>
       <h1>Videos</h1>
